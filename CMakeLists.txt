@@ -19,10 +19,15 @@ ament_auto_add_library(pb_back_up_frees_space_behavior SHARED
   src/behaviors/back_up_free_space.cpp
 )
 
-ament_auto_add_library(layers SHARED
+ament_auto_add_library(pb_nav2_costmap_layers SHARED
   src/layers/intensity_voxel_layer.cpp
   src/layers/semantic_polygon_layer.cpp
   src/terrain_semantic_zones.cpp
+)
+
+target_link_libraries(pb_nav2_costmap_layers
+  nav2_costmap_2d::layers
+  nav2_costmap_2d::nav2_costmap_2d_core
 )
 
 add_executable(terrain_zone_monitor
@@ -45,12 +50,12 @@ ament_target_dependencies(terrain_zone_monitor
 )
 
 if(TARGET yaml-cpp)
-  target_link_libraries(layers yaml-cpp)
+  target_link_libraries(pb_nav2_costmap_layers yaml-cpp)
   target_link_libraries(terrain_zone_monitor yaml-cpp)
 else()
-  target_include_directories(layers PRIVATE ${YAML_CPP_INCLUDE_DIRS})
+  target_include_directories(pb_nav2_costmap_layers PRIVATE ${YAML_CPP_INCLUDE_DIRS})
   target_include_directories(terrain_zone_monitor PRIVATE ${YAML_CPP_INCLUDE_DIRS})
-  target_link_libraries(layers ${YAML_CPP_LIBRARIES})
+  target_link_libraries(pb_nav2_costmap_layers ${YAML_CPP_LIBRARIES})
   target_link_libraries(terrain_zone_monitor ${YAML_CPP_LIBRARIES})
 endif()
 
