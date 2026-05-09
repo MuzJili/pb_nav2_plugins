@@ -13,6 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
+find_package(yaml-cpp REQUIRED)
 
 ament_auto_add_library(pb_back_up_frees_space_behavior SHARED
   src/behaviors/back_up_free_space.cpp
@@ -20,6 +21,41 @@ ament_auto_add_library(pb_back_up_frees_space_behavior SHARED
 
 ament_auto_add_library(layers SHARED
   src/layers/intensity_voxel_layer.cpp
+  src/layers/semantic_polygon_layer.cpp
+  src/terrain_semantic_zones.cpp
+)
+
+add_executable(terrain_zone_monitor
+  src/terrain_zone_monitor.cpp
+  src/terrain_semantic_zones.cpp
+)
+
+target_include_directories(terrain_zone_monitor PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+ament_target_dependencies(terrain_zone_monitor
+  geometry_msgs
+  rclcpp
+  std_msgs
+  tf2
+  tf2_ros
+  visualization_msgs
+)
+
+if(TARGET yaml-cpp)
+  target_link_libraries(layers yaml-cpp)
+  target_link_libraries(terrain_zone_monitor yaml-cpp)
+else()
+  target_include_directories(layers PRIVATE ${YAML_CPP_INCLUDE_DIRS})
+  target_include_directories(terrain_zone_monitor PRIVATE ${YAML_CPP_INCLUDE_DIRS})
+  target_link_libraries(layers ${YAML_CPP_LIBRARIES})
+  target_link_libraries(terrain_zone_monitor ${YAML_CPP_LIBRARIES})
+endif()
+
+install(TARGETS terrain_zone_monitor
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 if(BUILD_TESTING)
