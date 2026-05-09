@@ -63,6 +63,11 @@ install(TARGETS terrain_zone_monitor
   DESTINATION lib/${PROJECT_NAME}
 )
 
+# This package used to install a costmap plugin library named liblayers.so.
+# Nav2 also ships a liblayers.so, so a stale package-local copy can shadow Nav2's
+# library when standalone costmap tests load plugins from LD_LIBRARY_PATH.
+install(CODE "file(REMOVE \"\${CMAKE_INSTALL_PREFIX}/lib/liblayers.so\")")
+
 if(BUILD_TESTING)
   set(ament_cmake_clang_format_CONFIG_FILE "${CMAKE_SOURCE_DIR}/.clang-format")
   set(ament_cmake_clang_tidy_CONFIG_FILE "${CMAKE_SOURCE_DIR}/.clang-tidy")
